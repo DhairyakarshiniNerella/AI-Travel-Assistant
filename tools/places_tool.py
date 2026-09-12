@@ -17,13 +17,26 @@ def places_tool(city: str, category: str):
 
     category_map = {
         "restaurant": "catering.restaurant",
+        "restaurants": "catering.restaurant",
+
         "hotel": "accommodation.hotel",
+        "hotels": "accommodation.hotel",
+
         "tourist": "tourism",
         "tourist attraction": "tourism",
+        "tourist attractions": "tourism",
+
         "attraction": "tourism",
+        "attractions": "tourism",
+
         "temple": "tourism",
+        "temples": "tourism",
+
         "monument": "tourism",
+        "monuments": "tourism",
+
         "landmark": "tourism",
+        "landmarks": "tourism",
     }
 
     geoapify_category = category_map.get(category.lower())
