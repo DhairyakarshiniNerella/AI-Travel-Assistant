@@ -10,6 +10,7 @@ chromadb
 sentence-transformers
 python-dotenv
 pypdf
+docx2txt
 requests
 unstructured
 openpyxl

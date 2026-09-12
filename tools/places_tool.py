@@ -63,11 +63,12 @@ def places_tool(city: str, category: str):
 
         name = properties.get("name", "Unknown")
 
-        # Build a short address instead of using Geoapify's
-        # very long "formatted" address.
+        # Build a short address from granular fields instead of using
+        # Geoapify's "address_line1" (which is just the place name,
+        # duplicating `name`) or "formatted" (which is very long).
         address_parts = [
-            properties.get("address_line1"),
-            properties.get("address_line2"),
+            properties.get("street"),
+            properties.get("suburb") or properties.get("neighbourhood"),
             properties.get("city"),
             properties.get("postcode")
         ]
@@ -79,7 +80,11 @@ def places_tool(city: str, category: str):
         )
 
         if not address:
-            address = f"{city}"
+            address = (
+                properties.get("address_line2")
+                or properties.get("formatted")
+                or city
+            )
 
         contact = properties.get("contact") or {}
 
