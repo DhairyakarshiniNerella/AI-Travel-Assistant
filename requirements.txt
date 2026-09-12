@@ -1,0 +1,16 @@
+streamlit
+langchain
+langchain-groq
+langchain-community
+langchain-core
+langgraph
+langchain-huggingface
+langchain-chroma
+chromadb
+sentence-transformers
+python-dotenv
+pypdf
+requests
+unstructured
+openpyxl
+msoffcrypto-tool
