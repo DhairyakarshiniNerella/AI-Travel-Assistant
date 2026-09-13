@@ -1,11 +1,5 @@
 import os
 
-# Must run before huggingface_hub is imported by anything below (directly
-# or via langchain_huggingface) since it reads this env var once into a
-# module-level constant. Model is already cached locally after first use,
-# so this skips slow online freshness checks on every request.
-os.environ.setdefault("HF_HUB_OFFLINE", "1")
-
 import streamlit as st
 import ast
 import json

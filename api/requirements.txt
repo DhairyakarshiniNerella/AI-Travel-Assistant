@@ -1,0 +1,5 @@
+# This API function only uses Python's standard library (http.server, json).
+# An explicit, empty requirements file here overrides the project root's
+# requirements.txt for this function, so Vercel doesn't try to bundle the
+# full Streamlit/RAG dependency stack (which exceeds Vercel's 500MB function
+# size limit) into this endpoint.
