@@ -10,7 +10,7 @@ The application can answer questions from a travel knowledge base and use extern
 * 🔎 RAG-based document retrieval
 * 🧠 LangGraph agent workflow
 * 📚 Travel knowledge base
-* 🖼️ OCR support for images
+* 🖼️ Vision-LLM image understanding (identifies landmarks/subjects in photos)
 * 🔢 HuggingFace embeddings
 * 🗄️ ChromaDB vector database
 * 🌦️ Weather tool
@@ -53,7 +53,8 @@ Documents
 Document Loading
     |
     v
-Text Extraction / OCR
+Text Extraction (PDF/DOCX/TXT/XLSX)
+or Vision-LLM Description (images)
     |
     v
 Chunking
@@ -88,7 +89,7 @@ Answer
 | Groq         | LLM inference           |
 | HuggingFace  | Text embeddings         |
 | ChromaDB     | Vector database         |
-| OCR          | Image text extraction   |
+| Groq Vision LLM | Image understanding (landmark/subject identification) |
 | Git & GitHub | Version control         |
 
 ## 📂 Project Structure
@@ -97,27 +98,41 @@ Answer
 AI-Travel-Assistant/
 │
 ├── app.py
-├── agent.py
-├── create_vectorstore.py
-├── test_rag.py
-├── test_vectorstore.py
+│
+├── agents/
+│   ├── travel_agent.py       (main LangGraph agent used by app.py)
+│   ├── weather_agent.py
+│   └── places_agent.py
 │
 ├── tools/
-│   ├── rag_tool.py
+│   ├── weather_tool.py
 │   ├── places_tool.py
-│   └── weather_tool.py
+│   └── rag_tool.py
 │
-├── ingestion/
+├── services/
+│   ├── geocoding_service.py
+│   ├── weather_service.py
+│   └── places_service.py
+│
+├── rag/
 │   ├── document_loader.py
-│   ├── chunking.py
-│   └── embeddings.py
+│   ├── text_splitter.py
+│   ├── embeddings.py
+│   ├── image_vision.py
+│   ├── retriever.py
+│   └── vector_store.py
 │
 ├── data/
 │   └── documents/
 │       ├── travel_guide_india.txt
+│       ├── travel_guide_india.pdf
+│       ├── travel_guide_india.docx
+│       ├── travel_guide_india.xlsx
 │       └── travel_guide_india.png
 │
 ├── requirements.txt
+├── packages.txt
+├── .env.example
 ├── .gitignore
 └── README.md
 ```
@@ -146,18 +161,18 @@ Collection name:
 travel_knowledge
 ```
 
-## 🖼️ OCR
+## 🖼️ Image Understanding
 
-Images containing travel information can be processed using OCR.
+Uploaded travel photos are processed by a vision-capable Groq LLM, which identifies the landmark or subject and generates a short description.
 
 ```text
 Image
  |
  v
-OCR
+Vision LLM (Groq)
  |
  v
-Extracted Text
+Generated Description
  |
  v
 Chunking
@@ -169,7 +184,9 @@ Embeddings
 ChromaDB
 ```
 
-This allows information from images to become searchable through the RAG pipeline.
+This allows the content of uploaded photos to become searchable through the RAG pipeline.
+
+Note: this is a vision-language model describing what it sees, not OCR — it's not designed to transcribe dense or small text in an image character-for-character.
 
 ## 🤖 Agentic AI
 
@@ -234,6 +251,7 @@ Create a `.env` file:
 
 ```env
 GROQ_API_KEY=your_groq_api_key
+GEOAPIFY_API_KEY=your_geoapify_api_key
 ```
 
 Do not commit `.env` to GitHub.
@@ -269,7 +287,7 @@ The main objective of this project is to gain practical experience with:
 * Vector databases
 * Embeddings
 * Semantic search
-* OCR
+* Vision-language models for image understanding
 * LangChain
 * LangGraph
 * Agentic AI
@@ -281,7 +299,7 @@ The main objective of this project is to gain practical experience with:
 
 **Status: 🚧 In Development**
 
-Core functionality has been implemented, including RAG, ChromaDB, HuggingFace embeddings, OCR, LangGraph agent, weather tool, places tool, Groq LLM, and Streamlit UI.
+Core functionality has been implemented, including RAG, ChromaDB, HuggingFace embeddings, vision-LLM image understanding, LangGraph agent, weather tool, places tool, Groq LLM, and Streamlit UI.
 
 ## 👩‍💻 Author
 
