@@ -122,13 +122,7 @@ AI-Travel-Assistant/
 │   ├── retriever.py
 │   └── vector_store.py
 │
-├── data/
-│   └── documents/
-│       ├── travel_guide_india.txt
-│       ├── travel_guide_india.pdf
-│       ├── travel_guide_india.docx
-│       ├── travel_guide_india.xlsx
-│       └── travel_guide_india.png
+├── data
 │
 ├── requirements.txt
 ├── packages.txt
