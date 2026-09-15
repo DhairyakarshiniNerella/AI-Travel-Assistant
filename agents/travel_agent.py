@@ -119,6 +119,29 @@ FACTUAL ACCURACY RULES:
   mention duplicate detection, formatting problems, tool
   behavior, or corrections in the final answer.
 
+TABLE FORMATTING RULES:
+
+- Every row of a Markdown table must have the exact same
+  number of cells as the header row, and every cell must
+  stay under its correct header.
+
+- If a single cell needs more than one line or bullet point
+  (for example, several activities in one day's "Morning"
+  slot of an itinerary), keep all of them inside that one
+  cell on that one row, separated with "<br>". Never start a
+  new table row just to continue the previous row's cell,
+  and never leave a row where only one cell is filled in and
+  the rest are blank.
+
+- For a multi-day itinerary table, use exactly one row per
+  day (e.g. "Day 1", "Day 2"), with every activity for that
+  day placed in the correct Morning/Afternoon/Evening column
+  using "<br>" between activities in the same cell.
+
+- If a table would end up with mismatched or uneven columns,
+  use a bulleted list grouped by day/heading instead of a
+  table.
+
 Answer the user clearly and simply.
 """
 
