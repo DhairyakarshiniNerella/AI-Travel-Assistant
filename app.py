@@ -10,7 +10,38 @@ from rag.vector_store import create_vectorstore
 
 
 def _normalize_list_line(line):
-    return re.sub(r"^\s*(\d+[.)]|[-*])\s*", "", line).strip().lower()
+    line = line.strip()
+
+    # Markdown table row (e.g. "| 4 | **Temple X** | City | ... |").
+    # The leading cell is usually just a row number, which is different
+    # on every row even when the LLM is looping and repeating the rest
+    # of the row verbatim. Drop a purely numeric leading cell so those
+    # rows normalize to the same value and the repeat check below can
+    # actually catch them.
+    if line.startswith("|"):
+        cells = [cell.strip() for cell in line.strip("|").split("|")]
+
+        if cells and re.fullmatch(r"\d+", cells[0]):
+            cells = cells[1:]
+
+        line = " ".join(cells)
+        line = re.sub(r"[*_`]", "", line)
+
+        return line.strip().lower()
+
+    line = re.sub(r"^\s*(\d+[.)]|[-*])\s*", "", line)
+
+    # Numbered/bulleted item whose name is bolded (e.g. "6. **Temple X**
+    # - some description"). Small LLMs sometimes dodge a whole-line
+    # duplicate check by keeping the name identical across items while
+    # rewriting the trailing description each time, so key off the
+    # bolded name alone rather than the full line when one is present.
+    bold_match = re.match(r"\*\*(.+?)\*\*", line)
+
+    if bold_match:
+        return bold_match.group(1).strip().lower()
+
+    return line.strip().lower()
 
 
 def truncate_runaway_repetition(text, max_word_repeats=6, max_line_repeats=3):
@@ -85,6 +116,49 @@ def truncate_runaway_repetition(text, max_word_repeats=6, max_line_repeats=3):
         )
 
     return truncated
+
+
+def remove_duplicate_list_items(text):
+    """
+    truncate_runaway_repetition only catches a duplicate item once it
+    repeats several times *back to back*. It won't catch the same
+    place named twice with other, distinct items in between (e.g.
+    item 16 and item 19 of a 20-item list both naming the same
+    landmark) - that's not a degenerate loop, just a duplicate the
+    model slipped in. Drop the repeat instead of the model's whole
+    answer, and renumber numbered lists so the sequence stays
+    contiguous.
+    """
+
+    numbered_pattern = re.compile(r"^(\s*)(\d+)([.)])(\s*)(.*)$")
+    bulleted_pattern = re.compile(r"^\s*[-*]\s+")
+
+    seen = set()
+    result_lines = []
+    counter = 0
+
+    for line in text.split("\n"):
+
+        numbered_match = numbered_pattern.match(line)
+        is_list_item = bool(numbered_match) or bool(bulleted_pattern.match(line))
+
+        normalized = _normalize_list_line(line) if is_list_item else ""
+
+        if is_list_item and normalized:
+
+            if normalized in seen:
+                continue
+
+            seen.add(normalized)
+
+            if numbered_match:
+                indent, _, separator, spacing, rest = numbered_match.groups()
+                counter += 1
+                line = f"{indent}{counter}{separator}{spacing}{rest}"
+
+        result_lines.append(line)
+
+    return "\n".join(result_lines)
 
 
 # =========================================================
@@ -1038,6 +1112,7 @@ if question:
             final_answer = final_answer.replace("<br/>", "\n")
             final_answer = final_answer.replace("<br />", "\n")
             final_answer = truncate_runaway_repetition(final_answer)
+            final_answer = remove_duplicate_list_items(final_answer)
 
         st.markdown(final_answer)
 
